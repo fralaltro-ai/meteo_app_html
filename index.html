@@ -487,6 +487,11 @@
 
         // --- Gestione Ricerca ---
         let searchTimeout;
+        // Nascondi l'errore globale (se visibile) quando l'utente inizia a scrivere per cercare una nuova città
+        searchInput.addEventListener('focus', () => {
+            errorMessage.style.display = 'none';
+        });
+
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.trim();
             clearTimeout(searchTimeout);
@@ -549,10 +554,12 @@
         }
 
         // --- Gestione Meteo ---
-        function showLoader() {
+        function showLoader(keepError = false) {
             loader.style.display = 'flex';
             contentArea.style.display = 'none';
-            errorMessage.style.display = 'none';
+            if (!keepError) {
+                errorMessage.style.display = 'none';
+            }
         }
 
         function showError(msg) {
@@ -561,14 +568,18 @@
             errorMessage.style.display = 'block';
         }
 
-        function showContent() {
+        function showContent(keepError = false) {
             loader.style.display = 'none';
-            errorMessage.style.display = 'none';
+            if (!keepError) {
+                errorMessage.style.display = 'none';
+            }
             contentArea.style.display = 'flex';
         }
 
         async function fetchWeather(lat, lon, cityName) {
-            showLoader();
+            // Non nascondere l'errore se è già visibile (es. messaggio geolocalizzazione)
+            const isErrorVisible = errorMessage.style.display === 'block';
+            showLoader(isErrorVisible);
             try {
                 const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`;
                 const response = await fetch(url);
@@ -576,7 +587,8 @@
 
                 const data = await response.json();
                 renderWeather(data, cityName);
-                showContent();
+
+                showContent(isErrorVisible);
             } catch (error) {
                 console.error(error);
                 showError("Impossibile caricare i dati meteo. Riprova più tardi.");
@@ -690,7 +702,18 @@
                     },
                     (error) => {
                         console.warn("Geolocalizzazione fallita/negata:", error);
-                        showError("Impossibile ottenere la posizione. Cerca una città tramite la barra di ricerca in alto.");
+
+                        // Controllo se siamo su protocollo file://
+                        if (window.location.protocol === 'file:') {
+                            showError("I browser bloccano la geolocalizzazione sui file locali (file://). Cerca una città o usa un server web.");
+                        } else if (error.code === error.PERMISSION_DENIED) {
+                            showError("Hai negato il permesso di geolocalizzazione. Cerca una città tramite la barra in alto.");
+                        } else {
+                            showError("Impossibile ottenere la posizione. Cerca una città manualmente.");
+                        }
+
+                        // Fallback su Roma se la geolocalizzazione fallisce per permettere di vedere l'app
+                        fetchWeather(41.9028, 12.4964, "Roma");
                     },
                     { timeout: 10000 }
                 );

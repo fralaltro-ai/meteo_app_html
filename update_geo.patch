@@ -1,0 +1,22 @@
+--- index.html
++++ index.html
+@@ -737,8 +737,17 @@
+                         fetchWeather(lat, lon, cityName);
+                     },
+                     (error) => {
+                         console.warn("Geolocalizzazione fallita/negata:", error);
+-                        showError("Impossibile ottenere la posizione. Cerca una città tramite la barra di ricerca in alto.");
++
++                        // Controllo se siamo su protocollo file://
++                        if (window.location.protocol === 'file:') {
++                            showError("Per motivi di sicurezza, i browser bloccano la geolocalizzazione automatica quando apri un file locale (file://). Per favore, cerca la tua città usando la barra in alto, oppure ospita questo file su un server web (anche locale).");
++                        } else if (error.code === error.PERMISSION_DENIED) {
++                            showError("Hai negato il permesso di geolocalizzazione. Cerca una città tramite la barra in alto.");
++                        } else {
++                            showError("Impossibile ottenere la posizione. Riprova più tardi o cerca una città manualmente.");
++                        }
++
++                        // Carica una città di default (es: Roma) per mostrare l'app
++                        fetchWeather(41.9028, 12.4964, "Roma (Default)");
+                     },
+                     { timeout: 10000 }
