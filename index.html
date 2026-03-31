@@ -315,8 +315,19 @@
         .pollen-fill { height: 100%; border-radius: 3px; background: var(--primary-color); width: 0%; transition: width 0.5s; }
 
         /* Wind Gauge */
-        .wind-gauge-container { display: flex; align-items: center; gap: 16px; }
-        .wind-compass { position: relative; width: 60px; height: 60px; border-radius: 50%; border: 3px solid rgba(128,128,128,0.2); display: flex; justify-content: center; align-items: center; }
+        .wind-gauge-container { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .wind-compass { 
+            position: relative; 
+            width: 64px; 
+            height: 64px; 
+            flex-shrink: 0;
+            aspect-ratio: 1 / 1;
+            border-radius: 50%; 
+            border: 3px solid rgba(128,128,128,0.2); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
         .wind-arrow { font-size: 24px; position: absolute; transition: transform 0.5s; transform-origin: center; display: inline-block; line-height: 1; }
 
         /* Sun Path */
@@ -783,7 +794,7 @@
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     animation: false,
-                    layout: { padding: { top: 35, bottom: 20, left: 5, right: 5 } },
+                    layout: { padding: { top: 50, bottom: 20, left: 10, right: 10 } },
                     plugins: {
                         legend: {display: false},
                         tooltip: { 
@@ -803,10 +814,10 @@
                             ticks: {color: isDark?'#aeaeb2':'#8e8e93', maxTicksLimit: 8, padding: 10} 
                         },
                         y: { 
-                            display: false, // Modern look: hide Y axis
+                            display: false, 
                             grid: {display: false},
-                            suggestedMin: Math.min(...data)-3, 
-                            suggestedMax: Math.max(...data)+3 
+                            suggestedMin: Math.min(...data)-4, 
+                            suggestedMax: Math.max(...data)+6 // More breathing room for top labels
                         }
                     }
                 },
@@ -822,7 +833,7 @@
                             // Show icons every 4 steps for better spacing on all screens
                             if (i % 4 === 0 && i < meta.data.length && meta.data[i]) {
                                 const x = meta.data[i].x;
-                                const y = meta.data[i].y - 25;
+                                const y = meta.data[i].y - 35; // Moved up to accommodate vertical layout
                                 if (x < -10 || x > chart.width + 10) return;
 
                                 const iconEl = document.createElement('div');
@@ -830,9 +841,9 @@
                                 const info = getW(hourly.weather_code[startIdx + i]);
                                 const temp = data[i];
                                 iconEl.innerHTML = `
-                                    <div style="display: flex; align-items: center; gap: 4px; white-space: nowrap;">
+                                    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                                        <span style="font-size: 13px; font-weight: 700; opacity: 0.9;">${temp}°</span>
                                         <span style="--icon-color: ${info.color}">${info.icon}</span>
-                                        <span style="font-size: 13px; font-weight: 700; opacity: 0.8;">${temp}°</span>
                                     </div>
                                 `;
                                 iconEl.style.left = `${x}px`;
