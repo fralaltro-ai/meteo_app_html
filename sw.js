@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meteo-app-cache-v1';
+const CACHE_NAME = 'meteo-app-cache-v2';
 const DATA_CACHE_NAME = 'meteo-data-cache-v1';
 
 const FILES_TO_CACHE = [
