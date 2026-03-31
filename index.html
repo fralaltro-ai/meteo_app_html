@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Meteo App Premium</title>
+    <title>Meteo</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☀️</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☀️</text></svg>">
     <meta name="theme-color" content="#f0f4f8">
@@ -32,6 +32,14 @@
             --header-bg-clouds: url('https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=800&q=80') center/cover;
             --header-bg-rain: url('https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=800&q=80') center/cover;
             --header-bg-snow: url('https://images.unsplash.com/photo-1483664852095-d6cc6870702d?auto=format&fit=crop&w=800&q=80') center/cover;
+            
+            /* Icon Colors */
+            --sun-color: #ffab00;
+            --cloud-color: #94a3b8;
+            --rain-color: #0ea5e9;
+            --snow-color: #cbd5e1;
+            --storm-color: #8b5cf6;
+            --fog-color: #94a3b8;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -219,7 +227,15 @@
         .section-title { font-size: 20px; font-weight: 700; margin: 0 0 16px 8px; display: flex; align-items: center; gap: 8px; }
 
         /* Chart Section */
-        .chart-wrapper { height: 220px; width: 100%; position: relative; }
+        .chart-wrapper { height: 220px; width: 100%; position: relative; margin-top: 10px; }
+        .chart-icon-overlay {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            pointer-events: none;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
 
         /* Accordion Daily Forecast */
         .daily-list { display: flex; flex-direction: column; gap: 12px; }
@@ -266,16 +282,27 @@
         .hi-temp { font-size: 16px; font-weight: 700; }
 
         /* Details Grid */
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .grid-2 { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 16px; 
+        }
+
+        @media (max-width: 360px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
 
         .detail-card {
             display: flex;
             flex-direction: column;
             gap: 12px;
+            padding: 20px; /* Reduced from 24px to give more space inside */
+            min-height: 140px;
+            justify-content: space-between;
         }
-        .detail-title { font-size: 14px; font-weight: 600; color: var(--secondary-text); display: flex; align-items: center; gap: 6px; }
-        .detail-val { font-size: 28px; font-weight: 800; }
-        .detail-sub { font-size: 14px; font-weight: 500; }
+        .detail-title { font-size: 13px; font-weight: 600; color: var(--secondary-text); display: flex; align-items: center; gap: 6px; }
+        .detail-val { font-size: 24px; font-weight: 800; }
+        .detail-sub { font-size: 13px; font-weight: 500; }
 
         /* AQI */
         .aqi-bar-container { height: 8px; border-radius: 4px; background: var(--aqi-gradient); position: relative; margin-top: 8px; }
@@ -293,10 +320,10 @@
         .wind-arrow { font-size: 24px; position: absolute; transition: transform 0.5s; transform-origin: center; display: inline-block; line-height: 1; }
 
         /* Sun Path */
-        .sun-path-container { position: relative; width: 100%; height: 80px; overflow: hidden; margin-top: 10px; }
-        .sun-arc { width: 100%; height: 160px; border-radius: 50%; border: 2px dashed rgba(128,128,128,0.4); border-bottom: none; position: absolute; top: 0; left: 0; box-sizing: border-box;}
-        .sun-icon { position: absolute; font-size: 24px; transform: translate(-50%, -50%); transition: all 0.5s; }
-        .sun-times { display: flex; justify-content: space-between; margin-top: 4px; font-size: 13px; font-weight: 600; color: var(--secondary-text); }
+        .sun-path-container { position: relative; width: 100%; aspect-ratio: 2 / 1; overflow: hidden; margin-top: 10px; }
+        .sun-arc { width: 100%; height: 200%; border-radius: 50%; border: 2px dashed rgba(128,128,128,0.4); border-bottom: none; position: absolute; top: 0; left: 0; box-sizing: border-box;}
+        .sun-icon { position: absolute; font-size: 22px; transform: translate(-50%, -50%); transition: all 0.5s; z-index: 5; }
+        .sun-times { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; font-weight: 600; color: var(--secondary-text); }
 
         /* Loader */
         #loader { display: none; justify-content: center; padding: 40px; }
@@ -433,36 +460,36 @@
 
     <script>
         const svgIcons = {
-            sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>',
-            cloudSun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em"><path d="M12 2v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="M20 12h2"></path><path d="m19.07 4.93-1.41 1.41"></path><path d="M15.947 12.65a4 4 0 0 0-5.925-4.128"></path><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"></path></svg>',
-            cloud: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>',
-            fog: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path><line x1="8" y1="21" x2="16" y2="21"></line><line x1="10" y1="23" x2="14" y2="23"></line></svg>',
-            rain: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path><line x1="12" y1="22" x2="12" y2="24"></line><line x1="8" y1="22" x2="8" y2="24"></line><line x1="16" y1="22" x2="16" y2="24"></line></svg>',
-            snow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path><line x1="8" y1="22" x2="8" y2="24"></line><line x1="12" y1="22" x2="12" y2="24"></line><line x1="16" y1="22" x2="16" y2="24"></line><path d="M8 15h.01"></path><path d="M12 15h.01"></path><path d="M16 15h.01"></path></svg>',
-            storm: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path><polygon points="13 19 15 21 12 24"></polygon></svg>'
+            sun: '<svg viewBox="0 0 24 24" fill="none" stroke="var(--icon-color, currentColor)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>',
+            cloudSun: '<svg viewBox="0 0 24 24" fill="none" stroke="var(--icon-color, currentColor)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em"><path d="M12 2v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="M20 12h2"></path><path d="m19.07 4.93-1.41 1.41"></path><path d="M15.947 12.65a4 4 0 0 0-5.925-4.128"></path><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"></path></svg>',
+            cloud: '<svg viewBox="0 0 24 24" fill="none" stroke="var(--icon-color, currentColor)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>',
+            fog: '<svg viewBox="0 0 24 24" fill="none" stroke="var(--icon-color, currentColor)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path><line x1="8" y1="21" x2="16" y2="21"></line><line x1="10" y1="23" x2="14" y2="23"></line></svg>',
+            rain: '<svg viewBox="0 0 24 24" fill="none" stroke="var(--icon-color, currentColor)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path><line x1="12" y1="22" x2="12" y2="24"></line><line x1="8" y1="22" x2="8" y2="24"></line><line x1="16" y1="22" x2="16" y2="24"></line></svg>',
+            snow: '<svg viewBox="0 0 24 24" fill="none" stroke="var(--icon-color, currentColor)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path><line x1="8" y1="22" x2="8" y2="24"></line><line x1="12" y1="22" x2="12" y2="24"></line><line x1="16" y1="22" x2="16" y2="24"></line><path d="M8 15h.01"></path><path d="M12 15h.01"></path><path d="M16 15h.01"></path></svg>',
+            storm: '<svg viewBox="0 0 24 24" fill="none" stroke="var(--icon-color, currentColor)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path><polygon points="13 19 15 21 12 24"></polygon></svg>'
         };
 
         const weatherCodes = {
-            0: { desc: 'Sereno', icon: svgIcons.sun, bg: 'var(--header-bg-clear)' },
-            1: { desc: 'Preval. sereno', icon: svgIcons.cloudSun, bg: 'var(--header-bg-clear)' },
-            2: { desc: 'Parz. nuvoloso', icon: svgIcons.cloudSun, bg: 'var(--header-bg-clouds)' },
-            3: { desc: 'Coperto', icon: svgIcons.cloud, bg: 'var(--header-bg-clouds)' },
-            45: { desc: 'Nebbia', icon: svgIcons.fog, bg: 'var(--header-bg-clouds)' },
-            48: { desc: 'Nebbia brina', icon: svgIcons.fog, bg: 'var(--header-bg-clouds)' },
-            51: { desc: 'Pioviggine', icon: svgIcons.rain, bg: 'var(--header-bg-rain)' },
-            53: { desc: 'Pioviggine mod.', icon: svgIcons.rain, bg: 'var(--header-bg-rain)' },
-            55: { desc: 'Pioviggine fitta', icon: svgIcons.rain, bg: 'var(--header-bg-rain)' },
-            56: { desc: 'Pioggia gelata', icon: svgIcons.rain, bg: 'var(--header-bg-rain)' },
-            61: { desc: 'Pioggia debole', icon: svgIcons.rain, bg: 'var(--header-bg-rain)' },
-            63: { desc: 'Pioggia', icon: svgIcons.rain, bg: 'var(--header-bg-rain)' },
-            65: { desc: 'Pioggia forte', icon: svgIcons.rain, bg: 'var(--header-bg-rain)' },
-            71: { desc: 'Neve debole', icon: svgIcons.snow, bg: 'var(--header-bg-snow)' },
-            73: { desc: 'Neve', icon: svgIcons.snow, bg: 'var(--header-bg-snow)' },
-            75: { desc: 'Neve forte', icon: svgIcons.snow, bg: 'var(--header-bg-snow)' },
-            80: { desc: 'Rovesci deboli', icon: svgIcons.rain, bg: 'var(--header-bg-rain)' },
-            81: { desc: 'Rovesci', icon: svgIcons.rain, bg: 'var(--header-bg-rain)' },
-            82: { desc: 'Rovesci forti', icon: svgIcons.storm, bg: 'var(--header-bg-rain)' },
-            95: { desc: 'Temporale', icon: svgIcons.storm, bg: 'var(--header-bg-rain)' }
+            0: { desc: 'Sereno', icon: svgIcons.sun, bg: 'var(--header-bg-clear)', color: 'var(--sun-color)' },
+            1: { desc: 'Preval. sereno', icon: svgIcons.cloudSun, bg: 'var(--header-bg-clear)', color: 'var(--sun-color)' },
+            2: { desc: 'Parz. nuvoloso', icon: svgIcons.cloudSun, bg: 'var(--header-bg-clouds)', color: 'var(--cloud-color)' },
+            3: { desc: 'Coperto', icon: svgIcons.cloud, bg: 'var(--header-bg-clouds)', color: 'var(--cloud-color)' },
+            45: { desc: 'Nebbia', icon: svgIcons.fog, bg: 'var(--header-bg-clouds)', color: 'var(--fog-color)' },
+            48: { desc: 'Nebbia brina', icon: svgIcons.fog, bg: 'var(--header-bg-clouds)', color: 'var(--fog-color)' },
+            51: { desc: 'Pioviggine', icon: svgIcons.rain, bg: 'var(--header-bg-rain)', color: 'var(--rain-color)' },
+            53: { desc: 'Pioviggine mod.', icon: svgIcons.rain, bg: 'var(--header-bg-rain)', color: 'var(--rain-color)' },
+            55: { desc: 'Pioviggine fitta', icon: svgIcons.rain, bg: 'var(--header-bg-rain)', color: 'var(--rain-color)' },
+            56: { desc: 'Pioggia gelata', icon: svgIcons.rain, bg: 'var(--header-bg-rain)', color: 'var(--rain-color)' },
+            61: { desc: 'Pioggia debole', icon: svgIcons.rain, bg: 'var(--header-bg-rain)', color: 'var(--rain-color)' },
+            63: { desc: 'Pioggia', icon: svgIcons.rain, bg: 'var(--header-bg-rain)', color: 'var(--rain-color)' },
+            65: { desc: 'Pioggia forte', icon: svgIcons.rain, bg: 'var(--header-bg-rain)', color: 'var(--rain-color)' },
+            71: { desc: 'Neve debole', icon: svgIcons.snow, bg: 'var(--header-bg-snow)', color: 'var(--snow-color)' },
+            73: { desc: 'Neve', icon: svgIcons.snow, bg: 'var(--header-bg-snow)', color: 'var(--snow-color)' },
+            75: { desc: 'Neve forte', icon: svgIcons.snow, bg: 'var(--header-bg-snow)', color: 'var(--snow-color)' },
+            80: { desc: 'Rovesci deboli', icon: svgIcons.rain, bg: 'var(--header-bg-rain)', color: 'var(--rain-color)' },
+            81: { desc: 'Rovesci', icon: svgIcons.rain, bg: 'var(--header-bg-rain)', color: 'var(--rain-color)' },
+            82: { desc: 'Rovesci forti', icon: svgIcons.storm, bg: 'var(--header-bg-rain)', color: 'var(--storm-color)' },
+            95: { desc: 'Temporale', icon: svgIcons.storm, bg: 'var(--header-bg-rain)', color: 'var(--storm-color)' }
         };
 
         const daysOfWeek = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
@@ -609,9 +636,9 @@
             $('mainHeader').style.background = bg;
             $('cityName').textContent = name;
             const now = new Date(c.time);
-            $('dateTime').textContent = `${daysOfWeek[now.getDay()]}, ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+            $('dateTime').textContent = `${daysOfWeek[now.getDay()]} ${now.getDate()}, ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
             $('tempHuge').textContent = `${Math.round(c.temperature_2m)}°`;
-            $('conditionMain').innerHTML = `<span style="display:inline-flex; align-items:center; gap:8px;">${info.icon} ${info.desc}</span>`;
+            $('conditionMain').innerHTML = `<span style="display:inline-flex; align-items:center; gap:8px; --icon-color: ${info.color}">${info.icon} ${info.desc}</span>`;
             $('hlTemps').textContent = `H: ${Math.round(d.temperature_2m_max[0])}°  L: ${Math.round(d.temperature_2m_min[0])}°`;
 
             // Atmosphere details
@@ -627,7 +654,7 @@
             for(let i=0; i<7; i++) {
                 const di = getW(d.weather_code[i]);
                 const dt = new Date(d.time[i]);
-                const dayStr = i===0 ? 'Oggi' : daysOfWeek[dt.getDay()];
+                const dayStr = i===0 ? 'Oggi' : `${daysOfWeek[dt.getDay()]} ${dt.getDate()}`;
                 const wrap = document.createElement('div');
                 wrap.className = 'daily-item-wrapper';
 
@@ -641,7 +668,7 @@
                         hourlyHtml += `
                             <div class="hourly-inline-item">
                                 <span class="hi-time">${ht.getHours()}:00</span>
-                                <span class="hi-icon">${getW(w.hourly.weather_code[j]).icon}</span>
+                                <span class="hi-icon" style="--icon-color: ${getW(w.hourly.weather_code[j]).color}">${getW(w.hourly.weather_code[j]).icon}</span>
                                 <span class="hi-temp">${Math.round(w.hourly.temperature_2m[j])}°</span>
                             </div>`;
                     }
@@ -650,7 +677,7 @@
                 wrap.innerHTML = `
                     <div class="daily-summary" onclick="this.nextElementSibling.classList.toggle('expanded')">
                         <span class="daily-day">${dayStr}</span>
-                        <span class="daily-icon">${di.icon}</span>
+                        <span class="daily-icon" style="--icon-color: ${di.color}">${di.icon}</span>
                         <div class="daily-temps">
                             <span class="daily-tmin">${Math.round(d.temperature_2m_min[i])}°</span>
                             <span>${Math.round(d.temperature_2m_max[i])}°</span>
@@ -702,8 +729,8 @@
             const rx = 50 - 50 * Math.cos(angle);
             const ry = 100 - 100 * Math.sin(angle);
             $('sunPos').style.left = `${rx}%`;
-            $('sunPos').style.top = `calc(${ry}% - 10px)`;
-            $('sunPos').innerHTML = (pct<=0||pct>=1) ? '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none" width="1em" height="1em"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>' : svgIcons.sun;
+            $('sunPos').style.top = `${ry}%`;
+            $('sunPos').innerHTML = (pct<=0||pct>=1) ? '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none" width="1em" height="1em" style="color:var(--secondary-text)"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>' : `<span style="--icon-color: var(--sun-color)">${svgIcons.sun}</span>`;
 
             // Moon phase calculation
             const moonPhase = getMoonPhase(now);
@@ -756,42 +783,73 @@
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     animation: false,
+                    layout: { padding: { top: 35, bottom: 20, left: 5, right: 5 } },
                     plugins: {
                         legend: {display: false},
-                        tooltip: { callbacks: { label: c => c.raw + '°' } }
+                        tooltip: { 
+                            backgroundColor: isDark ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                            titleColor: isDark ? '#fff' : '#000',
+                            bodyColor: isDark ? '#fff' : '#000',
+                            borderColor: color,
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false,
+                            callbacks: { label: c => c.raw + '°' } 
+                        }
                     },
                     scales: {
-                        x: { grid: {display:false}, ticks: {color: isDark?'#aeaeb2':'#8e8e93', maxTicksLimit: 8} },
-                        y: { grid: {color: gridCol}, ticks: {color: isDark?'#aeaeb2':'#8e8e93', callback: v=>v+'°'}, suggestedMin: Math.min(...data)-2, suggestedMax: Math.max(...data)+2 }
+                        x: { 
+                            grid: {display:false}, 
+                            ticks: {color: isDark?'#aeaeb2':'#8e8e93', maxTicksLimit: 8, padding: 10} 
+                        },
+                        y: { 
+                            display: false, // Modern look: hide Y axis
+                            grid: {display: false},
+                            suggestedMin: Math.min(...data)-3, 
+                            suggestedMax: Math.max(...data)+3 
+                        }
                     }
                 },
                 plugins: [{
                     id: 'customIcons',
                     afterDraw: (chart) => {
                         const chartArea = chart.canvas.parentNode;
-                        if (!chartArea._iconsRendered) {
-                            chartArea.querySelectorAll('.chart-icon-overlay').forEach(el => el.remove());
-                            const meta = chart.getDatasetMeta(0);
-                            chart.data.datasets[0].data.forEach((dp, i) => {
-                                if (i%3===0 && i < meta.data.length) {
-                                    const x = meta.data[i].x;
-                                    const y = meta.data[i].y - 25;
-                                    const iconEl = document.createElement('div');
-                                    iconEl.className = 'chart-icon-overlay';
-                                    iconEl.innerHTML = icons[i];
-                                    iconEl.style.position = 'absolute';
-                                    iconEl.style.left = `${x}px`;
-                                    iconEl.style.top = `${y}px`;
+                        // Always remove and redraw icons to handle responsiveness
+                        chartArea.querySelectorAll('.chart-icon-overlay').forEach(el => el.remove());
+                        
+                        const meta = chart.getDatasetMeta(0);
+                        chart.data.datasets[0].data.forEach((dp, i) => {
+                            // Show icons every 4 steps for better spacing on all screens
+                            if (i % 4 === 0 && i < meta.data.length && meta.data[i]) {
+                                const x = meta.data[i].x;
+                                const y = meta.data[i].y - 25;
+                                if (x < -10 || x > chart.width + 10) return;
+
+                                const iconEl = document.createElement('div');
+                                iconEl.className = 'chart-icon-overlay';
+                                const info = getW(hourly.weather_code[startIdx + i]);
+                                const temp = data[i];
+                                iconEl.innerHTML = `
+                                    <div style="display: flex; align-items: center; gap: 4px; white-space: nowrap;">
+                                        <span style="--icon-color: ${info.color}">${info.icon}</span>
+                                        <span style="font-size: 13px; font-weight: 700; opacity: 0.8;">${temp}°</span>
+                                    </div>
+                                `;
+                                iconEl.style.left = `${x}px`;
+                                iconEl.style.top = `${y}px`;
+                                
+                                // Modern alignment: nudge icons away from edges
+                                if (x < 30) {
+                                    iconEl.style.transform = 'translate(10%, -50%)';
+                                } else if (x > chart.width - 30) {
+                                    iconEl.style.transform = 'translate(-110%, -50%)';
+                                } else {
                                     iconEl.style.transform = 'translate(-50%, -50%)';
-                                    iconEl.style.fontSize = '24px';
-                                    iconEl.style.color = isDark ? '#fff' : '#000';
-                                    iconEl.style.pointerEvents = 'none';
-                                    iconEl.style.zIndex = '10';
-                                    chartArea.appendChild(iconEl);
                                 }
-                            });
-                            chartArea._iconsRendered = true;
-                        }
+                                
+                                chartArea.appendChild(iconEl);
+                            }
+                        });
                     }
                 }]
             });
