@@ -33,8 +33,8 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.url.includes('api.open-meteo.com')) {
-    // Network First strategy per le chiamate API
+  // Network First strategy per le chiamate API
+  if (event.request.url.includes('api.open-meteo.com') || event.request.url.includes('air-quality-api.open-meteo.com')) {
     event.respondWith(
       caches.open(DATA_CACHE_NAME).then((cache) => {
         return fetch(event.request)
