@@ -548,7 +548,17 @@
                         d.results.forEach(city => {
                             const el = document.createElement('div');
                             el.className = 'search-result-item';
-                            el.innerHTML = `<strong>${city.name}</strong> <small style="color:var(--secondary-text)">${city.admin1||''} ${city.country||''}</small>`;
+
+                            const nameEl = document.createElement('strong');
+                            nameEl.textContent = city.name;
+
+                            const infoEl = document.createElement('small');
+                            infoEl.style.color = 'var(--secondary-text)';
+                            infoEl.textContent = ` ${city.admin1||''} ${city.country||''}`;
+
+                            el.appendChild(nameEl);
+                            el.appendChild(infoEl);
+
                             el.onclick = () => {
                                 $('searchInput').value = '';
                                 $('searchResults').style.display='none';
