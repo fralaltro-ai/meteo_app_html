@@ -560,7 +560,7 @@
                     } else {
                         $('searchResults').style.display='none';
                     }
-                } catch(e){}
+                } catch(e){ console.error("Search error:", e); }
             }, 500);
         });
 
