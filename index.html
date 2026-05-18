@@ -16,7 +16,6 @@
 
     <style>
         :root {
-            /* Colori base UI */
             --text-primary: #ffffff;
             --text-secondary: rgba(255, 255, 255, 0.7);
             --card-bg: rgba(0, 0, 0, 0.25);
@@ -24,13 +23,11 @@
             --glass-blur: blur(24px);
             --shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
             
-            /* Colori Gradienti Meteo (saranno applicati dal JS) */
             --bg-clear: linear-gradient(180deg, #1A73E8 0%, #5CA0F2 100%);
             --bg-night: linear-gradient(180deg, #0A1128 0%, #16223F 100%);
             --bg-clouds: linear-gradient(180deg, #5D6D7E 0%, #85929E 100%);
             --bg-rain: linear-gradient(180deg, #2C3E50 0%, #4CA1AF 100%);
             
-            /* Colori Icone */
             --sun-color: #FFD600;
             --cloud-color: #E2E8F0;
             --rain-color: #60A5FA;
@@ -43,12 +40,10 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
+            margin: 0; padding: 0; min-height: 100vh;
             color: var(--text-primary);
             -webkit-font-smoothing: antialiased;
-            background: var(--bg-clear); /* Default */
+            background: var(--bg-clear);
             background-attachment: fixed;
             transition: background 0.8s ease;
         }
@@ -62,9 +57,7 @@
             gap: 16px;
         }
 
-        /* Nav & Search */
         .top-nav { display: flex; gap: 12px; z-index: 100; position: relative; }
-
         .search-container { position: relative; flex: 1; display: flex; align-items: center; }
 
         .search-input {
@@ -76,100 +69,69 @@
             backdrop-filter: var(--glass-blur);
             -webkit-backdrop-filter: var(--glass-blur);
             color: var(--text-primary);
-            font-size: 16px;
-            font-weight: 500;
-            outline: none;
+            font-size: 16px; font-weight: 500; outline: none;
             transition: background 0.2s;
         }
         .search-input::placeholder { color: var(--text-secondary); }
         .search-input:focus { background: rgba(0,0,0,0.4); }
 
-        .search-icon { position: absolute; right: 16px; opacity: 0.7; pointer-events: none; }
-
-        .geo-btn {
+        .geo-btn, .install-btn {
             background: var(--card-bg);
             backdrop-filter: var(--glass-blur);
             border: 1px solid var(--card-border);
             border-radius: 20px;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-            color: var(--text-primary);
+            width: 48px; height: 48px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; cursor: pointer; color: var(--text-primary);
+            flex-shrink: 0;
         }
-        .geo-btn:active { background: rgba(0,0,0,0.4); }
+        .geo-btn:active, .install-btn:active { background: rgba(0,0,0,0.4); }
+        .install-btn { background: #ffffff; color: #1a1a1a; display: none; }
 
         .search-results {
             position: absolute;
             top: 56px; left: 0; right: 0;
             background: rgba(20, 20, 25, 0.95);
             backdrop-filter: var(--glass-blur);
-            border-radius: 20px;
-            max-height: 250px;
-            overflow-y: auto;
-            display: none;
-            border: 1px solid var(--card-border);
-            z-index: 200;
+            border-radius: 20px; max-height: 250px; overflow-y: auto;
+            display: none; border: 1px solid var(--card-border); z-index: 200;
         }
-
         .search-result-item { padding: 14px 20px; border-bottom: 1px solid var(--card-border); cursor: pointer; }
         .search-result-item:last-child { border-bottom: none; }
 
         .history-container { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin-bottom: 8px; }
         .history-container::-webkit-scrollbar { display: none; }
         .history-chip {
-            padding: 6px 14px;
-            background: var(--card-bg);
-            border-radius: 14px;
-            font-size: 13px;
-            font-weight: 600;
-            white-space: nowrap;
-            border: 1px solid var(--card-border);
-            cursor: pointer;
+            padding: 6px 14px; background: var(--card-bg); border-radius: 14px;
+            font-size: 13px; font-weight: 600; white-space: nowrap;
+            border: 1px solid var(--card-border); cursor: pointer;
         }
 
-        /* Hero / Header */
-        .hero {
-            text-align: center;
-            padding: 20px 0 30px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .ios-banner {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px; padding: 14px; text-align: center;
+            font-size: 14px; font-weight: 500; line-height: 1.4;
+            display: none; backdrop-filter: var(--glass-blur);
         }
+
+        .hero { text-align: center; padding: 20px 0 30px 0; display: flex; flex-direction: column; align-items: center; }
         .city-title { font-size: 38px; font-weight: 400; margin: 0; letter-spacing: 0.5px; }
-        .temp-huge { font-size: 100px; font-weight: 200; line-height: 1; margin: 8px 0; position: relative; left: 8px;}
-        .condition-main { font-size: 20px; font-weight: 500; color: var(--text-secondary); text-transform: capitalize; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;}
+        .temp-huge { font-size: 100px; font-weight: 200; line-height: 1; margin: 8px 0; position: relative; left: 8px; }
+        .condition-main { font-size: 20px; font-weight: 500; color: var(--text-secondary); text-transform: capitalize; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
         .hl-temps { font-size: 16px; font-weight: 500; color: var(--text-secondary); }
 
-        /* Bento Cards */
         .bento-card {
-            background: var(--card-bg);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--card-border);
-            border-radius: 24px;
-            padding: 16px;
-            box-shadow: var(--shadow);
-            display: flex;
-            flex-direction: column;
+            background: var(--card-bg); backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur); border: 1px solid var(--card-border);
+            border-radius: 24px; padding: 16px; box-shadow: var(--shadow);
+            display: flex; flex-direction: column;
         }
-
-        .section-title { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin: 0 0 12px 0; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;}
-
-        /* Chart Section */
+        .section-title { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin: 0 0 12px 0; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
         .chart-wrapper { height: 180px; width: 100%; position: relative; }
 
-        /* Daily List */
         .daily-list { display: flex; flex-direction: column; }
-        .daily-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
+        .daily-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .daily-item:last-child { border-bottom: none; padding-bottom: 0; }
         .daily-item:first-child { padding-top: 0; }
         .daily-day { flex: 1; font-size: 16px; font-weight: 500; }
@@ -177,58 +139,50 @@
         .daily-temps { flex: 1; display: flex; justify-content: flex-end; gap: 16px; font-size: 16px; font-weight: 600; }
         .daily-tmin { color: var(--text-secondary); }
 
-        /* Bento Grid 2 Columns */
         .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-        
-        .bento-square {
-            justify-content: space-between;
-            aspect-ratio: 1 / 1;
-        }
-
+        .bento-square { justify-content: space-between; aspect-ratio: 1 / 1; }
         .detail-val { font-size: 28px; font-weight: 500; margin-top: auto; }
         .detail-sub { font-size: 14px; font-weight: 500; color: var(--text-secondary); margin-top: 4px; }
 
-        /* AQI / UV Bars */
-        .progress-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.2); position: relative; margin-top: 12px; width: 100%; overflow: hidden;}
+        .progress-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.2); position: relative; margin-top: 12px; width: 100%; overflow: hidden; }
         .progress-fill { height: 100%; border-radius: 3px; position: absolute; left: 0; top: 0; }
         .aqi-grad { background: linear-gradient(90deg, #4caf50, #ffeb3b, #ff9800, #f44336, #9c27b0); }
 
-        /* Wind & Sun */
         .flex-center { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
-        .wind-compass { 
-            position: relative; width: 48px; height: 48px; 
-            border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); 
-            display: flex; justify-content: center; align-items: center; 
-        }
+        .wind-compass { position: relative; width: 48px; height: 48px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); display: flex; justify-content: center; align-items: center; }
         .wind-arrow { font-size: 20px; transition: transform 0.5s; line-height: 1; }
-
-        .sun-times { display: flex; flex-direction: column; gap: 4px; font-size: 14px; font-weight: 500; margin-top: auto;}
+        .sun-times { display: flex; flex-direction: column; gap: 4px; font-size: 14px; font-weight: 500; margin-top: auto; }
         
-        /* Pollen */
         .pollen-row { display: flex; align-items: center; justify-content: space-between; font-size: 14px; margin-bottom: 8px; }
         .pollen-track { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.1); width: 60px; overflow: hidden; }
         .pollen-fill { height: 100%; background: var(--text-primary); width: 0%; }
 
-        /* Loader */
         #loader { display: none; justify-content: center; padding: 40px; }
         .spinner { width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.2); border-top: 3px solid #fff; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
         #errorMsg { display: none; background: rgba(255,59,48,0.2); color: #ff453a; padding: 16px; border-radius: 16px; font-weight: 500; text-align: center; border: 1px solid rgba(255,59,48,0.3); }
 
         #content { display: none; flex-direction: column; gap: 16px; animation: fade 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
         @keyframes fade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
     </style>
 </head>
 <body>
     <div class="container">
+        <div id="iosInstallHint" class="ios-banner">
+            Per installare l'app su iPhone: tocca il tasto di condivisione 
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline; vertical-align:middle; margin:0 2px;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> 
+            in basso e seleziona <strong>"Aggiungi alla schermata Home"</strong>.
+        </div>
+
         <div class="top-nav">
             <div class="search-container">
                 <input type="text" id="searchInput" class="search-input" placeholder="Cerca località..." autocomplete="off">
                 <div id="searchResults" class="search-results"></div>
             </div>
-            <button class="geo-btn" id="geoBtn">
+            <button class="install-btn" id="installPwaBtn" title="Installa Applicazione">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            </button>
+            <button class="geo-btn" id="geoBtn" title="Geolocalizzazione">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
             </button>
         </div>
@@ -446,7 +400,6 @@
             const info = getW(c.weather_code);
             const now = new Date(c.time);
             
-            // Dynamic Background logic
             let bg = info.bg;
             if(now.getHours() < 6 || now.getHours() > 19) bg = 'var(--bg-night)';
             document.body.style.background = bg;
@@ -530,8 +483,45 @@
             });
         }
 
+        // --- GESTIONE LIFECYCLE INSTALLAZIONE PWA ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Impedisce la comparsa del mini-infobar nativo di Chrome su Android
+            e.preventDefault();
+            // Memorizza l'evento per attivarlo in seguito
+            deferredPrompt = e;
+            // Mostra il pulsante di installazione personalizzato nella barra superiore
+            $('installPwaBtn').style.display = 'flex';
+        });
+
+        $('installPwaBtn').onclick = async () => {
+            if (!deferredPrompt) return;
+            // Mostra il prompt nativo di installazione
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`Risposta dell'utente all'installazione: ${outcome}`);
+            deferredPrompt = null;
+            $('installPwaBtn').style.display = 'none';
+        };
+
+        window.addEventListener('appinstalled', () => {
+            deferredPrompt = null;
+            $('installPwaBtn').style.display = 'none';
+            console.log('L\'applicazione è stata installata correttamente nella Home!');
+        });
+
+        function checkIosBanner() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+            // Se è un dispositivo iOS e NON è aperto in modalità standalone (app installata)
+            if (isIOS && !isInStandaloneMode) {
+                $('iosInstallHint').style.display = 'block';
+            }
+        }
+
         function init() {
             renderHist();
+            checkIosBanner();
             if(history.length>0) fetchAll(history[0].lat, history[0].lon, history[0].n);
             else fetchAll(41.89, 12.51, "Roma");
         }
