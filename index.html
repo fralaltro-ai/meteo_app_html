@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Meteo</title>
+    <title>Meteo Premium</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☀️</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☀️</text></svg>">
     <meta name="theme-color" content="#1a1a1a">
@@ -57,6 +57,7 @@
             gap: 16px;
         }
 
+        /* Nav & Input */
         .top-nav { display: flex; gap: 12px; z-index: 100; position: relative; }
         .search-container { position: relative; flex: 1; display: flex; align-items: center; }
 
@@ -75,29 +76,28 @@
         .search-input::placeholder { color: var(--text-secondary); }
         .search-input:focus { background: rgba(0,0,0,0.4); }
 
-        .geo-btn, .install-btn {
-            background: var(--card-bg);
-            backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            width: 48px; height: 48px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 20px; cursor: pointer; color: var(--text-primary);
-            flex-shrink: 0;
-        }
-        .geo-btn:active, .install-btn:active { background: rgba(0,0,0,0.4); }
-        .install-btn { background: #ffffff; color: #1a1a1a; display: none; }
-
         .search-results {
-            position: absolute;
-            top: 56px; left: 0; right: 0;
-            background: rgba(20, 20, 25, 0.95);
-            backdrop-filter: var(--glass-blur);
+            position: absolute; top: 56px; left: 0; right: 0;
+            background: rgba(20, 20, 25, 0.95); backdrop-filter: var(--glass-blur);
             border-radius: 20px; max-height: 250px; overflow-y: auto;
             display: none; border: 1px solid var(--card-border); z-index: 200;
         }
         .search-result-item { padding: 14px 20px; border-bottom: 1px solid var(--card-border); cursor: pointer; }
         .search-result-item:last-child { border-bottom: none; }
+
+        .btn-icon {
+            background: var(--card-bg); backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--card-border); border-radius: 20px;
+            width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
+            font-size: 20px; cursor: pointer; color: var(--text-primary); flex-shrink: 0;
+            transition: transform 0.1s, background 0.2s;
+        }
+        .btn-icon:active { background: rgba(0,0,0,0.4); transform: scale(0.95); }
+        
+        #installPwaBtn { 
+            background: #ffffff; color: #1a1a1a; display: none; 
+            box-shadow: 0 4px 12px rgba(255,255,255,0.3);
+        }
 
         .history-container { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin-bottom: 8px; }
         .history-container::-webkit-scrollbar { display: none; }
@@ -107,14 +107,22 @@
             border: 1px solid var(--card-border); cursor: pointer;
         }
 
-        .ios-banner {
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        /* Avvisi */
+        .alert-banner {
+            background: rgba(255, 59, 48, 0.2); border: 1px solid rgba(255, 59, 48, 0.4);
             border-radius: 20px; padding: 14px; text-align: center;
-            font-size: 14px; font-weight: 500; line-height: 1.4;
-            display: none; backdrop-filter: var(--glass-blur);
+            font-size: 13px; font-weight: 500; line-height: 1.4; display: none;
+            backdrop-filter: var(--glass-blur); color: #ffeb3b;
         }
 
+        .ios-banner {
+            background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px; padding: 14px; text-align: center;
+            font-size: 14px; font-weight: 500; line-height: 1.4; display: none;
+            backdrop-filter: var(--glass-blur);
+        }
+
+        /* Layout Principale */
         .hero { text-align: center; padding: 20px 0 30px 0; display: flex; flex-direction: column; align-items: center; }
         .city-title { font-size: 38px; font-weight: 400; margin: 0; letter-spacing: 0.5px; }
         .temp-huge { font-size: 100px; font-weight: 200; line-height: 1; margin: 8px 0; position: relative; left: 8px; }
@@ -122,23 +130,48 @@
         .hl-temps { font-size: 16px; font-weight: 500; color: var(--text-secondary); }
 
         .bento-card {
-            background: var(--card-bg); backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur); border: 1px solid var(--card-border);
-            border-radius: 24px; padding: 16px; box-shadow: var(--shadow);
+            background: var(--card-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); 
+            border: 1px solid var(--card-border); border-radius: 24px; padding: 16px; box-shadow: var(--shadow);
             display: flex; flex-direction: column;
         }
         .section-title { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin: 0 0 12px 0; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
         .chart-wrapper { height: 180px; width: 100%; position: relative; }
 
+        /* Accordion (Drill-Down) dei 7 giorni */
         .daily-list { display: flex; flex-direction: column; }
-        .daily-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .daily-item:last-child { border-bottom: none; padding-bottom: 0; }
-        .daily-item:first-child { padding-top: 0; }
+        .daily-item-wrapper { border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .daily-item-wrapper:last-child { border-bottom: none; }
+        
+        .daily-summary {
+            display: flex; align-items: center; padding: 14px 0; cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
         .daily-day { flex: 1; font-size: 16px; font-weight: 500; }
         .daily-icon { width: 40px; text-align: center; font-size: 22px; }
         .daily-temps { flex: 1; display: flex; justify-content: flex-end; gap: 16px; font-size: 16px; font-weight: 600; }
         .daily-tmin { color: var(--text-secondary); }
+        
+        .expand-icon { margin-left: 12px; color: var(--text-secondary); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0; }
+        .expand-icon.rotated { transform: rotate(180deg); }
 
+        .daily-details {
+            max-height: 0; overflow: hidden; opacity: 0;
+            transition: max-height 0.4s cubic-bezier(0, 1, 0, 1), opacity 0.3s ease, margin 0.3s ease;
+        }
+        .daily-details.expanded { max-height: 200px; opacity: 1; margin-bottom: 12px; }
+
+        .hourly-inline-list {
+            display: flex; gap: 16px; overflow-x: auto; padding: 16px;
+            background: rgba(0,0,0,0.15); border-radius: 16px; scrollbar-width: none;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .hourly-inline-list::-webkit-scrollbar { display: none; }
+        .hourly-inline-item { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 48px; }
+        .hi-time { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+        .hi-icon { font-size: 24px; }
+        .hi-temp { font-size: 15px; font-weight: 700; }
+
+        /* Griglia Dettagli */
         .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
         .bento-square { justify-content: space-between; aspect-ratio: 1 / 1; }
         .detail-val { font-size: 28px; font-weight: 500; margin-top: auto; }
@@ -160,7 +193,6 @@
         #loader { display: none; justify-content: center; padding: 40px; }
         .spinner { width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.2); border-top: 3px solid #fff; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        #errorMsg { display: none; background: rgba(255,59,48,0.2); color: #ff453a; padding: 16px; border-radius: 16px; font-weight: 500; text-align: center; border: 1px solid rgba(255,59,48,0.3); }
 
         #content { display: none; flex-direction: column; gap: 16px; animation: fade 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
         @keyframes fade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -168,6 +200,9 @@
 </head>
 <body>
     <div class="container">
+        
+        <div id="localFileWarning" class="alert-banner"></div>
+
         <div id="iosInstallHint" class="ios-banner">
             Per installare l'app su iPhone: tocca il tasto di condivisione 
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline; vertical-align:middle; margin:0 2px;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> 
@@ -179,10 +214,12 @@
                 <input type="text" id="searchInput" class="search-input" placeholder="Cerca località..." autocomplete="off">
                 <div id="searchResults" class="search-results"></div>
             </div>
-            <button class="install-btn" id="installPwaBtn" title="Installa Applicazione">
+            
+            <button class="btn-icon" id="installPwaBtn" title="Installa Applicazione">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
             </button>
-            <button class="geo-btn" id="geoBtn" title="Geolocalizzazione">
+            
+            <button class="btn-icon" id="geoBtn" title="Posizione Attuale">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
             </button>
         </div>
@@ -190,7 +227,7 @@
         <div class="history-container" id="historyChips"></div>
 
         <div id="loader"><div class="spinner"></div></div>
-        <div id="errorMsg"></div>
+        <div id="errorMsg" class="alert-banner" style="color: #ff453a;"></div>
 
         <div id="content">
             <div class="hero">
@@ -391,8 +428,22 @@
                 const a = aRes ? await aRes.json() : null;
                 render(name, w, a);
             } catch(e) {
-                $('loader').style.display='none'; $('errorMsg').style.display='block'; $('errorMsg').textContent = 'Errore di rete. Riprova.';
+                $('loader').style.display='none'; $('errorMsg').style.display='block'; $('errorMsg').innerHTML = '⚠️ Errore di rete. Impossibile scaricare i dati.';
             }
+        }
+
+        // ESPANSIONE ACCORDION GIORNALIERO
+        function toggleAccordion(element) {
+            const details = element.nextElementSibling;
+            const icon = element.querySelector('.expand-icon');
+            
+            // Chiudi gli altri aperti (opzionale, decommenta se vuoi chiuderli in automatico)
+            /* document.querySelectorAll('.daily-details.expanded').forEach(el => {
+                if(el !== details) { el.classList.remove('expanded'); el.previousElementSibling.querySelector('.expand-icon').classList.remove('rotated'); }
+            }); */
+
+            details.classList.toggle('expanded');
+            icon.classList.toggle('rotated');
         }
 
         function render(name, w, a) {
@@ -414,19 +465,55 @@
 
             renderChart(w.hourly);
 
-            const list = $('dailyList'); list.innerHTML = '';
+            // Costruzione Lista 7 Giorni + Drill-Down Orario
+            const list = $('dailyList'); 
+            let htmlDaily = '';
+            
             for(let i=0; i<7; i++) {
                 const di = getW(d.weather_code[i]);
                 const dt = new Date(d.time[i]);
                 const dayStr = i===0 ? 'Oggi' : daysOfWeek[dt.getDay()];
-                list.innerHTML += `
-                    <div class="daily-item">
-                        <span class="daily-day">${dayStr}</span>
-                        <span class="daily-icon" style="--icon-color:${di.color}">${di.icon}</span>
-                        <div class="daily-temps"><span class="daily-tmin">${Math.round(d.temperature_2m_min[i])}°</span><span>${Math.round(d.temperature_2m_max[i])}°</span></div>
+                
+                // Estrapolazione dati orari per lo specifico giorno (Drill-Down)
+                const dayPrefix = d.time[i].substring(0, 10);
+                let hourlyHtml = '';
+                
+                for(let j=0; j<w.hourly.time.length; j++) {
+                    if(w.hourly.time[j].startsWith(dayPrefix)) {
+                        const ht = new Date(w.hourly.time[j]);
+                        if(i===0 && ht < now) continue; // Salta le ore passate di oggi
+                        
+                        const hInfo = getW(w.hourly.weather_code[j]);
+                        hourlyHtml += `
+                            <div class="hourly-inline-item">
+                                <span class="hi-time">${ht.getHours()}:00</span>
+                                <span class="hi-icon" style="--icon-color:${hInfo.color}">${hInfo.icon}</span>
+                                <span class="hi-temp">${Math.round(w.hourly.temperature_2m[j])}°</span>
+                            </div>`;
+                    }
+                }
+
+                if(!hourlyHtml) hourlyHtml = '<div style="padding: 10px; text-align: center; color: var(--text-secondary); width: 100%; font-size: 13px;">Dati orari non disponibili per questa data</div>';
+
+                htmlDaily += `
+                    <div class="daily-item-wrapper">
+                        <div class="daily-summary" onclick="toggleAccordion(this)">
+                            <span class="daily-day">${dayStr}</span>
+                            <span class="daily-icon" style="--icon-color:${di.color}">${di.icon}</span>
+                            <div class="daily-temps">
+                                <span class="daily-tmin">${Math.round(d.temperature_2m_min[i])}°</span>
+                                <span>${Math.round(d.temperature_2m_max[i])}°</span>
+                            </div>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="daily-details">
+                            <div class="hourly-inline-list">${hourlyHtml}</div>
+                        </div>
                     </div>`;
             }
+            list.innerHTML = htmlDaily;
 
+            // Altri Dettagli
             if(a && a.current) {
                 const [aqiDesc, aqiPct] = getAQI(a.current.european_aqi);
                 $('aqiVal').textContent = a.current.european_aqi; $('aqiSub').textContent = aqiDesc;
@@ -486,20 +573,17 @@
         // --- GESTIONE LIFECYCLE INSTALLAZIONE PWA ---
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
-            // Impedisce la comparsa del mini-infobar nativo di Chrome su Android
+            console.log("Evento PWA beforeinstallprompt intercettato con successo!");
             e.preventDefault();
-            // Memorizza l'evento per attivarlo in seguito
             deferredPrompt = e;
-            // Mostra il pulsante di installazione personalizzato nella barra superiore
-            $('installPwaBtn').style.display = 'flex';
+            $('installPwaBtn').style.display = 'flex'; // Rivela il bottone
         });
 
         $('installPwaBtn').onclick = async () => {
             if (!deferredPrompt) return;
-            // Mostra il prompt nativo di installazione
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
-            console.log(`Risposta dell'utente all'installazione: ${outcome}`);
+            console.log(`Risposta utente: ${outcome}`);
             deferredPrompt = null;
             $('installPwaBtn').style.display = 'none';
         };
@@ -507,27 +591,35 @@
         window.addEventListener('appinstalled', () => {
             deferredPrompt = null;
             $('installPwaBtn').style.display = 'none';
-            console.log('L\'applicazione è stata installata correttamente nella Home!');
+            console.log('App installata correttamente!');
         });
 
-        function checkIosBanner() {
+        function checkEnvironments() {
+            // Avviso se si sta testando in locale (file://)
+            if (window.location.protocol === 'file:') {
+                $('localFileWarning').innerHTML = '⚠️ <strong>Stai testando in locale (file://).</strong> Chrome disattiva le PWA in questa modalità. Il bottone di installazione NON apparirà finché non pubblichi il sito online (es. Vercel o HTTPS).';
+                $('localFileWarning').style.display = 'block';
+            }
+
+            // Hint per gli utenti iOS Safari
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-            // Se è un dispositivo iOS e NON è aperto in modalità standalone (app installata)
-            if (isIOS && !isInStandaloneMode) {
+            if (isIOS && !isInStandaloneMode && window.location.protocol !== 'file:') {
                 $('iosInstallHint').style.display = 'block';
             }
         }
 
         function init() {
+            checkEnvironments();
             renderHist();
-            checkIosBanner();
             if(history.length>0) fetchAll(history[0].lat, history[0].lon, history[0].n);
             else fetchAll(41.89, 12.51, "Roma");
         }
 
         init();
-        if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
+        if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
+            window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
+        }
     </script>
 </body>
 </html>
